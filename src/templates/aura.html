@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NameAura</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap');
+    body { font-family: 'Inter', sans-serif; background: #0a0219; }
+
+    .semi-circle {
+      background: radial-gradient(circle at center top, #7e22ce 0%, #4c1d95 50%, transparent 80%);
+      filter: blur(30px);
+      opacity: 0.8;
+    }
+
+    .bar-glow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      filter: blur(20px);
+      opacity: 0.6;
+      border-radius: inherit;
+    }
+
+    /* Dynamic name sizing & wrapping */
+    .dynamic-name {
+      word-break: break-word;
+      line-height: 1;
+      font-weight: 900;
+      /* Clamp: min 2.5rem, prefer 10vw, max 5.5rem */
+      font-size: clamp(2.5rem, 10vw, 5.5rem);
+    }
+    .dynamic-name.long-name { font-size: clamp(2.2rem, 8vw, 4.5rem); }
+    body.capture-mode .dynamic-name {
+      background: none !important;
+      -webkit-text-fill-color: #fbbf24 !important;
+      color: #fbbf24 !important;
+    }
+    body.capture-mode #auraCard {
+      box-shadow: none;
+    }
+    body.capture-mode .action-buttons {
+      display: none !important;
+    }
+    @media (min-width: 1024px) {
+      .dynamic-name { font-size: clamp(3rem, 6vw, 6rem); }
+      .dynamic-name.long-name { font-size: clamp(2.5rem, 5vw, 5rem); }
+      #auraCard {
+        max-width: 900px;
+        min-height: 720px;
+        padding-top: 5rem;
+        padding-bottom: 3rem;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+    /* Lighter effects on small screens */
+    @media (max-width: 480px) {
+      .semi-circle { filter: blur(20px); opacity: 0.7; }
+    }
+
+    /* Respect reduced motion/preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .semi-circle { filter: blur(15px); opacity: 0.6; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
+
+  <div class="relative w-full max-w-sm sm:max-w-2xl lg:max-w-5xl mx-auto">
+
+    <!-- Glowing Semi-Circle -->
+    <div class="absolute -top-24 sm:-top-28 md:-top-32 left-1/2 -translate-x-1/2 
+      w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 semi-circle rounded-t-full"></div>
+
+    <!-- Card -->
+    <div id="auraCard" data-name="{{ name }}" class="relative bg-gradient-to-b from-white/10 via-white/5 to-transparent 
+      backdrop-blur-3xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden 
+      pt-16 sm:pt-20 md:pt-20 lg:pt-16 pb-8 lg:pb-8 px-6 sm:px-8 text-center w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-3xl xl:max-w-4xl">
+
+      <!-- Dynamic Name -->
+      {% set name_len = name|length %}
+      <h1 class="dynamic-name {% if name_len > 12 %}long-name{% endif %} bg-gradient-to-b from-yellow-300 via-yellow-400 to-orange-500 bg-clip-text text-transparent mb-3">
+        {{ name }}
+      </h1>
+
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-light text-white/90 mb-3">
+        Aura Meaning
+      </h2>
+
+      <!-- Dynamic Aura Meaning -->
+      <p class="text-base sm:text-lg md:text-xl text-white/70 leading-relaxed max-w-xs mx-auto">
+        {{ aura_meaning }}
+      </p>
+
+      <!-- Dynamic Traits -->
+      <div class="mt-10 sm:mt-12 lg:mt-8 space-y-6 sm:space-y-7">
+
+        {% for t in traits %}
+        <div>
+          <div class="flex justify-between text-white/90 mb-2">
+            <span class="text-lg sm:text-xl md:text-2xl font-medium trait-color" data-color="{{ t.color }}">{{ t.trait }}</span>
+            <span class="text-xl sm:text-2xl md:text-3xl font-bold">{{ t.score }}%</span>
+          </div>
+
+          <div class="h-12 sm:h-14 md:h-16 lg:h-12 bg-white/10 rounded-full overflow-hidden 
+            border border-white/30 backdrop-blur-sm shadow-lg relative">
+            <div class="h-full rounded-full bar-fill" data-score="{{ t.score }}" data-color="{{ t.color }}"></div>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      <!-- Peace Emoji -->
+      <div class="my-10 lg:my-6 text-5xl sm:text-6xl md:text-7xl">✌️</div>
+
+      <!-- Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10 lg:mt-6 action-buttons">
+        <a href="/" aria-label="Go back to homepage" class="flex items-center justify-center gap-3 px-8 py-4 sm:py-5 
+          bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full border 
+          border-white/30 text-white font-semibold text-base sm:text-lg transition-all hover:scale-105 shadow-xl">
+          Home
+        </a>
+
+        <!-- <button id="shareBtn" type="button" aria-label="Share your aura result" class="flex items-center justify-center gap-3 px-8 py-4 sm:py-5 
+          bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full border 
+          border-white/30 text-white font-semibold text-base sm:text-lg transition-all hover:scale-105 shadow-xl">
+          Share
+        </button> -->
+
+        <button id="downloadBtn" type="button" aria-label="Download your aura card" class="flex items-center justify-center gap-3 px-8 py-4 sm:py-5 
+          bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full border 
+          border-white/30 text-white font-semibold text-base sm:text-lg transition-all hover:scale-105 shadow-xl">
+          Download
+        </button>
+      </div>
+
+      <p class="mt-10 text-white/40 text-xs sm:text-sm">
+        Powered by <span class="font-bold text-yellow-400">NameAura</span>
+      </p>
+
+    </div>
+  </div>
+
+  <!-- Accessible toast region -->
+  <div id="toast" role="status" aria-live="polite" class="sr-only"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    (function() {
+      const card = document.getElementById('auraCard');
+      const shareBtn = document.getElementById('shareBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const toast = document.getElementById('toast');
+      // Apply dynamic colors and widths without inline template styles
+      document.querySelectorAll('.trait-color').forEach(el => {
+        const c = el.getAttribute('data-color');
+        if (c) el.style.color = c;
+      });
+      document.querySelectorAll('.bar-fill').forEach(el => {
+        const color = el.getAttribute('data-color');
+        const score = el.getAttribute('data-score');
+        if (score) el.style.width = `${score}%`;
+        if (color) el.style.backgroundColor = color;
+        el.style.opacity = '0.9';
+      });
+
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.remove('sr-only');
+        setTimeout(() => toast.classList.add('sr-only'), 2000);
+      }
+
+      // Download card as PNG via html2canvas
+      if (downloadBtn && card) {
+        downloadBtn.addEventListener('click', async () => {
+          downloadBtn.disabled = true;
+          try {
+            document.body.classList.add('capture-mode');
+            const canvas = await html2canvas(card, {
+              backgroundColor: '#0a0219',
+              scale: Math.min(window.devicePixelRatio || 1, 2),
+              useCORS: true
+            });
+            const link = document.createElement('a');
+            const safeName = (card.dataset.name || 'aura').trim().replace(/\s+/g, '_').toLowerCase();
+            link.href = canvas.toDataURL('image/png');
+            link.download = `${safeName || 'aura'}_card.png`;
+            link.click();
+            showToast('Downloading image…');
+          } catch (err) {
+            console.error('Download failed', err);
+            showToast('Could not generate image.');
+          } finally {
+            downloadBtn.disabled = false;
+            document.body.classList.remove('capture-mode');
+          }
+        });
+      }
+
+      // Share result via Web Share API or fallback to copy URL
+      if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+          const shareData = {
+            title: 'My NameAura',
+            text: `{{ (name or '')|e }} — {{ (aura_meaning or '')|e }}`,
+            url: window.location.origin
+          };
+          if (navigator.share) {
+            try { await navigator.share(shareData); } catch { /* dismissed */ }
+          } else if (navigator.clipboard && window.isSecureContext) {
+            try { await navigator.clipboard.writeText(shareData.url); showToast('Link copied to clipboard'); }
+            catch { showToast('Copy failed'); }
+          } else {
+            showToast('Sharing not available on this device');
+          }
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>
