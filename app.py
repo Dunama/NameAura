@@ -139,6 +139,7 @@ def generate_aura():
             "color": aura_colors.get(trait, "#ffffff"),
         }
         for trait, score in highlighted
+        # we added this comment to track github modifications
     ]
     format_name=name.upper()
     session['last_result'] = {
