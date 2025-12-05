@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__, template_folder='src/templates')
+app = Flask(__name__, template_folder='src/templates', static_folder='src/static')
 app.secret_key = os.environ.get("SECRET_KEY")
 
 # dictionary of the traits
